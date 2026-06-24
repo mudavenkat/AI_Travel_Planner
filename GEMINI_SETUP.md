@@ -75,3 +75,4 @@ pip install google-generativeai
 ---
 
 **🎒 Happy Travel Planning with Gemini AI! ✈️**
+

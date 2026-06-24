@@ -122,3 +122,10 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ Demo failed: {e}")
         print("💡 Make sure your Gemini API key is configured in config.py")
+
+
+
+
+
+
+

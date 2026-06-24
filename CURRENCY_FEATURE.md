@@ -128,3 +128,10 @@ This feature makes the app truly international and student-friendly:
 - **Cultural sensitivity** - prices in familiar currency
 
 **🌍 Your Student AI Travel Planner is now ready for students worldwide! ✈️**
+
+
+
+
+
+
+
