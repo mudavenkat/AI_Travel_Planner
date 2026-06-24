@@ -1,6 +1,6 @@
 # ✈️ Student AI Travel Planner
 
-App link:https://aitravelplanner-7bgzksmqm2isy2bdrefmym.streamlit.app/
+App link:https:[//aitravelplanner-7bgzksmqm2isy2bdrefmym.streamlit.app/](https://aitravelplanner-venkatsaicharanmuda.streamlit.app/)
 
 A beginner-friendly web application that generates personalized, budget-aware travel itineraries for students using AI. The app supports both **Gemini** and **OpenAI** APIs and emphasizes affordability, safety, and ease of use.
 
