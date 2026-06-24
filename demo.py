@@ -142,3 +142,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Demo failed: {e}")
         print("💡 Check your setup and try again")
+

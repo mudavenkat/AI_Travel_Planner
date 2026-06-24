@@ -7,7 +7,50 @@ import streamlit as st
 import json
 from planner import plan_trip, validate_itinerary, calculate_total_cost
 from config import get_provider
-from ai_client import test_gemini_availability
+from ai_client import test_provider_availability
+
+# Currency helpers
+# Minimal symbol/decimal mapping with sensible defaults
+CURRENCY_META = {
+    "USD": {"symbol": "$", "decimals": 2},
+    "EUR": {"symbol": "€", "decimals": 2},
+    "GBP": {"symbol": "£", "decimals": 2},
+    "JPY": {"symbol": "¥", "decimals": 0},
+    "CNY": {"symbol": "¥", "decimals": 2},
+    "INR": {"symbol": "₹", "decimals": 2},
+    "AUD": {"symbol": "A$", "decimals": 2},
+    "CAD": {"symbol": "C$", "decimals": 2},
+    "CHF": {"symbol": "CHF ", "decimals": 2},
+    "SEK": {"symbol": "SEK ", "decimals": 2},
+    "NOK": {"symbol": "NOK ", "decimals": 2},
+    "DKK": {"symbol": "DKK ", "decimals": 2},
+    "ZAR": {"symbol": "R", "decimals": 2},
+    "BRL": {"symbol": "R$", "decimals": 2},
+    "KRW": {"symbol": "₩", "decimals": 0},
+    "SGD": {"symbol": "S$", "decimals": 2},
+    "HKD": {"symbol": "HK$", "decimals": 2},
+    "NZD": {"symbol": "NZ$", "decimals": 2},
+    "MXN": {"symbol": "MX$", "decimals": 2},
+    "AED": {"symbol": "AED ", "decimals": 2},
+    "SAR": {"symbol": "SAR ", "decimals": 2},
+}
+
+def get_currency_meta(code: str) -> dict:
+    meta = CURRENCY_META.get(code)
+    if meta is None:
+        # Default to 2 decimals and prefix with code
+        return {"symbol": f"{code} ", "decimals": 2}
+    return meta
+
+def format_currency(amount: float, code: str) -> str:
+    meta = get_currency_meta(code)
+    decimals = meta["decimals"]
+    symbol = meta["symbol"]
+    fmt = f"{{:,.{decimals}f}}"
+    try:
+        return f"{symbol}{fmt.format(float(amount))}"
+    except Exception:
+        return f"{symbol}{amount}"
 
 # Page configuration
 st.set_page_config(
@@ -35,7 +78,7 @@ def main():
         # AI Provider Info
         st.subheader("AI Provider")
         current_provider = get_provider()
-        st.info(f"🤖 Using **{current_provider.title()}** AI (Google's free AI service)")
+        st.info(f"🤖 Using **{current_provider.title()}** AI")
         
         # Debug Mode
         debug_mode = st.checkbox(
@@ -45,8 +88,8 @@ def main():
         
         # Provider Status
         if debug_mode:
-            st.subheader("Gemini Status")
-            status = test_gemini_availability()
+            st.subheader("Provider Status")
+            status = test_provider_availability()
             
             for provider, state in status.items():
                 if state == "available":
@@ -108,11 +151,16 @@ def main():
                 )
             
             with col_budget2:
+                _meta = get_currency_meta(currency)
+                _decimals = _meta["decimals"]
+                _symbol = _meta["symbol"].strip()
+                _step = 1.0 if _decimals == 0 else (10 ** -_decimals)
                 budget = st.number_input(
-                    f"💰 Budget ({currency})",
+                    f"💰 Budget ({_symbol} {currency})",
                     min_value=1.0,
                     value=200.0 if currency == "USD" else 150.0,
-                    step=10.0,
+                    step=_step,
+                    format=f"%.{_decimals}f",
                     help=f"Total budget for your trip in {currency}"
                 )
         
@@ -199,17 +247,17 @@ def display_results(itinerary, summary, debug_mode=False, destination="Unknown",
     # Cost breakdown
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Total Estimated Cost", f"{currency} {total_cost}")
+        st.metric("Total Estimated Cost", format_currency(total_cost, currency))
     with col2:
         st.metric("Days", len(itinerary))
     with col3:
-        st.metric("Avg Daily Cost", f"{currency} {total_cost/len(itinerary):.1f}")
+        st.metric("Avg Daily Cost", format_currency(total_cost/len(itinerary), currency))
     
     # Display daily itinerary
     st.subheader("📅 Daily Breakdown")
     
     for day_data in itinerary:
-        with st.expander(f"Day {day_data['day']} - {currency} {day_data['cost']}"):
+        with st.expander(f"Day {day_data['day']} - {format_currency(day_data['cost'], currency)}"):
             col1, col2 = st.columns([2, 1])
             
             with col1:
@@ -225,7 +273,7 @@ def display_results(itinerary, summary, debug_mode=False, destination="Unknown",
                 st.write(f"🚌 {day_data['transport']}")
                 
                 st.write("**Daily Cost:**")
-                st.write(f"💰 {currency} {day_data['cost']}")
+                st.write(f"💰 {format_currency(day_data['cost'], currency)}")
     
     # Debug information
     if debug_mode:
@@ -303,17 +351,17 @@ def display_example_results(itinerary, summary, destination="Example", currency=
     # Cost breakdown
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Total Estimated Cost", f"{currency} {total_cost}")
+        st.metric("Total Estimated Cost", format_currency(total_cost, currency))
     with col2:
         st.metric("Days", len(itinerary))
     with col3:
-        st.metric("Avg Daily Cost", f"{currency} {total_cost/len(itinerary):.1f}")
+        st.metric("Avg Daily Cost", format_currency(total_cost/len(itinerary), currency))
     
     # Display daily itinerary without expanders
     st.subheader("📅 Example Daily Breakdown")
     
     for day_data in itinerary:
-        st.markdown(f"### Day {day_data['day']} - {currency} {day_data['cost']}")
+        st.markdown(f"### Day {day_data['day']} - {format_currency(day_data['cost'], currency)}")
         
         col1, col2 = st.columns([2, 1])
         
@@ -330,7 +378,7 @@ def display_example_results(itinerary, summary, destination="Example", currency=
             st.write(f"🚌 {day_data['transport']}")
             
             st.write("**Daily Cost:**")
-            st.write(f"💰 {currency} {day_data['cost']}")
+            st.write(f"💰 {format_currency(day_data['cost'], currency)}")
         
         st.markdown("---")
 

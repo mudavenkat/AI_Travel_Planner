@@ -175,3 +175,4 @@ The **Student AI Travel Planner** is now complete and ready for:
 ---
 
 **🎒 Happy Travel Planning! The app is ready to help students explore the world on a budget! ✈️**
+

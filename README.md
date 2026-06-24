@@ -27,12 +27,13 @@ A beginner-friendly web application that generates personalized, budget-aware tr
    ```bash
    pip install -r requirements.txt
    ```
-3. **Configure API keys** in `config.py`:
-   ```python
-   # Edit config.py
-   AI_PROVIDER = "gemini"  # or "openai"
-   GEMINI_API_KEY = "your_gemini_api_key_here"
-   OPENAI_API_KEY = "your_openai_api_key_here"
+3. **Configure API keys** in `.env`:
+   ```env
+   AI_PROVIDER=gemini  # or openai or groq
+   GEMINI_API_KEY=your_gemini_api_key_here
+   OPENAI_API_KEY=your_openai_api_key_here
+   GROQ_API_KEY=your_groq_api_key_here
+   GROQ_MODEL=openai/gpt-oss-20b   # or another OpenAI-compatible Groq model
    ```
 4. **Run the app**:
    ```bash
@@ -45,13 +46,13 @@ A beginner-friendly web application that generates personalized, budget-aware tr
 1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in with your Google account
 3. Click "Create API Key"
-4. Copy the key to `config.py`
+4. Copy the key to `.env`
 
 #### OpenAI API (Paid)
 1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
 2. Sign in and create an account
 3. Click "Create new secret key"
-4. Copy the key to `config.py`
+4. Copy the key to `.env`
 
 ## 📁 Project Structure
 
